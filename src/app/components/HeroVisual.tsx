@@ -18,9 +18,8 @@ function FloatingItem({
   return (
     <div
       className={cn(
-        'absolute flex items-center justify-center rounded-2xl',
-        'bg-background/90 border border-primary/15 shadow-lg shadow-primary/10',
-        'backdrop-blur-sm animate-[hero-float_5s_ease-in-out_infinite]',
+        'absolute flex items-center justify-center',
+        'animate-[hero-float_5s_ease-in-out_infinite]',
         className
       )}
       style={{ animationDelay: delay }}

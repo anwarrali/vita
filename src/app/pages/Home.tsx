@@ -111,9 +111,8 @@ export function Home() {
             <div className="lg:col-span-5 flex justify-center items-center order-1 lg:order-2 py-4">
               <div className="relative w-full max-w-[360px]">
                 <div className="absolute inset-4 rounded-[2rem] bg-primary/5 blur-2xl" />
-                <div className="relative rounded-[2rem] border border-primary/10 bg-background/40 backdrop-blur-sm p-6 md:p-8 shadow-lg">
                   <HeroVisual />
-                </div>
+                
               </div>
             </div>
           </div>

@@ -28,7 +28,10 @@ export function Header() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="Vita Shop Home">
               <Logo className="h-12 w-auto text-primary transition-transform duration-300 group-hover:scale-105" />
-              <span className="text-xl font-bold text-primary tracking-wide">Vita</span>
+              <div className="flex flex-col leading-none gap-0.5">
+                <span className="text-xl font-brand font-semibold text-primary">Vita</span>
+                <span className="text-xs font-brand font-medium text-primary/75 tracking-[0.2em] uppercase">Shop</span>
+              </div>
             </Link>
 
             {/* Desktop Navigation */}
