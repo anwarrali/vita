@@ -127,7 +127,7 @@ export function Cart() {
 
           {/* Order Summary */}
           <div>
-            <Card className="sticky top-20">
+            <Card className="lg:sticky lg:top-20">
               <CardContent className="p-6">
                 <h2 className="text-xl font-bold mb-6">ملخص الطلب</h2>
 

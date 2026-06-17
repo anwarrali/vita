@@ -103,7 +103,7 @@ export const Footer: React.FC = () => {
                   placeholder="بريدك الإلكتروني"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 text-sm rounded-lg bg-background border border-border text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                  className="w-full px-4 py-2 text-sm rounded-lg bg-background border border-border text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                 />
                 <textarea
                   required
@@ -111,7 +111,7 @@ export const Footer: React.FC = () => {
                   placeholder="رسالتك..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full px-4 py-2 text-sm rounded-lg bg-background border border-border text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
+                  className="w-full px-4 py-2 text-sm rounded-lg bg-background border border-border text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-none"
                 />
                 <button
                   type="submit"

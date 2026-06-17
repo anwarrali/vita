@@ -29,7 +29,7 @@ export function AdminLogin() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-[#0a0a14] p-4"
+      className="min-h-dvh flex items-center justify-center bg-[#0a0a14] p-4"
       dir="rtl"
     >
       {/* Background glow */}
@@ -62,9 +62,8 @@ export function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  autoFocus
                   placeholder="أدخل كلمة المرور"
-                  className="w-full pr-10 pl-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] focus:ring-2 focus:ring-[#292b99]/30 transition-all text-right"
+                  className="w-full pr-10 pl-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] focus:ring-2 focus:ring-[#292b99]/30 transition-colors text-right"
                 />
                 <button
                   type="button"

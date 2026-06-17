@@ -249,7 +249,7 @@ export const CheckoutPage: React.FC = () => {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-card border border-border rounded-lg p-6 sticky top-20">
+          <div className="bg-card border border-border rounded-lg p-6 lg:sticky lg:top-20">
             <h2 className="font-semibold text-lg mb-4 text-right">ملخص الطلب</h2>
 
             {/* Order Items */}

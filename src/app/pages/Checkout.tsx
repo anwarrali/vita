@@ -36,6 +36,10 @@ export function Checkout() {
   const shippingCost = selectedShipping?.cost ?? 0;
   const total = cartTotal + shippingCost;
 
+  const updateField = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -92,7 +96,7 @@ export function Checkout() {
   };
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-dvh py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold mb-2">إتمام الطلب</h1>
         <p className="text-muted-foreground mb-8">الدفع عند الاستلام — لا حاجة لإنشاء حساب</p>
@@ -111,9 +115,7 @@ export function Checkout() {
                       id="name"
                       required
                       value={formData.customerName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, customerName: e.target.value })
-                      }
+                      onChange={(e) => updateField('customerName', e.target.value)}
                       placeholder="أدخل اسمك الكامل"
                     />
                   </div>
@@ -126,9 +128,7 @@ export function Checkout() {
                       required
                       dir="ltr"
                       value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
+                      onChange={(e) => updateField('phone', e.target.value)}
                       placeholder="05X-XXX-XXXX"
                     />
                   </div>
@@ -146,9 +146,7 @@ export function Checkout() {
                       id="address"
                       required
                       value={formData.address}
-                      onChange={(e) =>
-                        setFormData({ ...formData, address: e.target.value })
-                      }
+                      onChange={(e) => updateField('address', e.target.value)}
                       placeholder="المدينة، الشارع، رقم البناية، رقم الشقة"
                       rows={3}
                     />
@@ -165,9 +163,9 @@ export function Checkout() {
                             type="button"
                             role="radio"
                             aria-checked={isSelected}
-                            onClick={() => setFormData({ ...formData, region: option.id })}
+                            onClick={() => setFormData((prev) => ({ ...prev, region: option.id }))}
                             className={cn(
-                              'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-all',
+                              'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-colors',
                               'hover:border-primary/50 hover:bg-primary/5',
                               isSelected
                                 ? 'border-primary bg-primary/10 shadow-sm'
@@ -193,9 +191,7 @@ export function Checkout() {
                     <Textarea
                       id="notes"
                       value={formData.notes}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notes: e.target.value })
-                      }
+                      onChange={(e) => updateField('notes', e.target.value)}
                       placeholder="أي ملاحظات خاصة بالطلب أو التوصيل"
                       rows={3}
                     />
@@ -242,7 +238,7 @@ export function Checkout() {
             </div>
 
             <div>
-              <Card className="sticky top-20">
+              <Card className="lg:sticky lg:top-20">
                 <CardHeader>
                   <CardTitle>ملخص الطلب</CardTitle>
                 </CardHeader>

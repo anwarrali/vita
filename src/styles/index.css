@@ -7,7 +7,29 @@ html {
   direction: rtl;
 }
 
-/* Ensure smooth scrolling */
+/* Ensure smooth scrolling on desktop; avoid animated scroll jumps on mobile keyboards */
 html {
   scroll-behavior: smooth;
+}
+
+@media (max-width: 767px) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .admin-layout {
+    min-height: 100dvh;
+  }
+
+  .admin-layout main {
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent iOS zoom-on-focus and reduce keyboard scroll jumps */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }

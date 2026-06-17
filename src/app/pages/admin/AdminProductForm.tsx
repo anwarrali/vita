@@ -8,8 +8,6 @@ import {
   ChevronUp, ChevronDown, Star,
 } from 'lucide-react';
 
-type ToggleField = 'in_stock' | 'is_featured' | 'is_new' | 'is_on_sale';
-
 interface FormState {
   id: string;
   name: string;
@@ -63,6 +61,70 @@ const EMPTY: FormState = {
   images: [],
   variants: [],
 };
+
+const INPUT_CLASS =
+  'w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] focus:ring-1 focus:ring-[#292b99]/50 transition-colors text-right';
+
+function FormInput({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  placeholder,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label className="block text-sm text-white/60 mb-1.5">
+        {label} {required && <span className="text-red-400">*</span>}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        placeholder={placeholder}
+        className={INPUT_CLASS}
+      />
+    </div>
+  );
+}
+
+function FormToggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex items-center justify-between cursor-pointer group">
+      <span className="text-sm text-white/70 group-hover:text-white transition-colors">{label}</span>
+      <button
+        type="button"
+        onClick={() => onChange(!checked)}
+        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+          checked ? 'bg-[#292b99]' : 'bg-white/10'
+        }`}
+      >
+        <span
+          className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all duration-200 ${
+            checked ? 'right-1' : 'right-6'
+          }`}
+        />
+      </button>
+    </label>
+  );
+}
 
 export function AdminProductForm() {
   const { id } = useParams<{ id: string }>();
@@ -310,45 +372,6 @@ export function AdminProductForm() {
     (c) => c.parent_id && c.parent_id === form.category
   );
 
-  const Toggle = ({ field, label }: { field: ToggleField; label: string }) => (
-    <label className="flex items-center justify-between cursor-pointer group">
-      <span className="text-sm text-white/70 group-hover:text-white transition-colors">{label}</span>
-      <button
-        type="button"
-        onClick={() => set(field, !form[field])}
-        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-          form[field] ? 'bg-[#292b99]' : 'bg-white/10'
-        }`}
-      >
-        <span
-          className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all duration-200 ${
-            form[field] ? 'right-1' : 'right-6'
-          }`}
-        />
-      </button>
-    </label>
-  );
-
-  const Input = ({
-    label, field, type = 'text', placeholder, required,
-  }: {
-    label: string; field: keyof FormState; type?: string; placeholder?: string; required?: boolean;
-  }) => (
-    <div>
-      <label className="block text-sm text-white/60 mb-1.5">
-        {label} {required && <span className="text-red-400">*</span>}
-      </label>
-      <input
-        type={type}
-        value={form[field] as string}
-        onChange={(e) => set(field, e.target.value)}
-        required={required}
-        placeholder={placeholder}
-        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] focus:ring-1 focus:ring-[#292b99]/50 transition-all text-right"
-      />
-    </div>
-  );
-
   return (
     <div dir="rtl">
       {/* Back */}
@@ -371,8 +394,8 @@ export function AdminProductForm() {
           {/* Basic Info */}
           <div className="bg-[#0f0f1b] border border-white/10 rounded-2xl p-6 space-y-4">
             <h3 className="text-sm font-semibold text-white/40 uppercase tracking-widest mb-4">معلومات المنتج</h3>
-            <Input label="الاسم بالعربية" field="name_ar" placeholder="مثال: كريم مرطب للوجه" required />
-            <Input label="الاسم بالإنجليزية" field="name" placeholder="Hydrating Face Cream" />
+            <FormInput label="الاسم بالعربية" value={form.name_ar} onChange={(v) => set('name_ar', v)} placeholder="مثال: كريم مرطب للوجه" required />
+            <FormInput label="الاسم بالإنجليزية" value={form.name} onChange={(v) => set('name', v)} placeholder="Hydrating Face Cream" />
             <div>
               <label className="block text-sm text-white/60 mb-1.5">الوصف بالعربية</label>
               <textarea
@@ -380,18 +403,18 @@ export function AdminProductForm() {
                 onChange={(e) => set('description_ar', e.target.value)}
                 rows={3}
                 placeholder="وصف المنتج..."
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-all text-right resize-none"
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-colors text-right resize-none"
               />
             </div>
-            <Input label="الماركة / العلامة التجارية" field="brand" placeholder="مثال: L'Oréal" />
+            <FormInput label="الماركة / العلامة التجارية" value={form.brand} onChange={(v) => set('brand', v)} placeholder="مثال: L'Oréal" />
           </div>
 
           {/* Pricing */}
           <div className="bg-[#0f0f1b] border border-white/10 rounded-2xl p-6 space-y-4">
             <h3 className="text-sm font-semibold text-white/40 uppercase tracking-widest mb-4">التسعير</h3>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="السعر (₪)" field="price" type="number" placeholder="0.00" required />
-              <Input label="السعر قبل التخفيض (₪)" field="original_price" type="number" placeholder="اختياري" />
+              <FormInput label="السعر (₪)" value={form.price} onChange={(v) => set('price', v)} type="number" placeholder="0.00" required />
+              <FormInput label="السعر قبل التخفيض (₪)" value={form.original_price} onChange={(v) => set('original_price', v)} type="number" placeholder="اختياري" />
             </div>
           </div>
 
@@ -439,7 +462,7 @@ export function AdminProductForm() {
                   onChange={(e) => setImageUrl(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImageUrl(); } }}
                   placeholder="https://..."
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-all"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-colors"
                 />
                 <button
                   type="button"
@@ -616,8 +639,8 @@ export function AdminProductForm() {
               <label className="block text-sm text-white/60 mb-1.5">القسم الرئيسي</label>
               <select
                 value={form.category}
-                onChange={(e) => { set('category', e.target.value); set('category_slug', ''); }}
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#292b99] transition-all"
+                onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value, category_slug: '' }))}
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#292b99] transition-colors"
               >
                 <option value="">— اختر القسم —</option>
                 {rootCategories.map((c) => (
@@ -631,7 +654,7 @@ export function AdminProductForm() {
                 <select
                   value={form.category_slug}
                   onChange={(e) => set('category_slug', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#292b99] transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#292b99] transition-colors"
                 >
                   <option value="">— القسم الفرعي —</option>
                   {subCategories.map((c) => (
@@ -645,10 +668,10 @@ export function AdminProductForm() {
           {/* Flags */}
           <div className="bg-[#0f0f1b] border border-white/10 rounded-2xl p-6 space-y-4">
             <h3 className="text-sm font-semibold text-white/40 uppercase tracking-widest mb-4">الخصائص</h3>
-            <Toggle field="in_stock" label="متوفر في المخزن" />
-            <Toggle field="is_featured" label="منتج مميز" />
-            <Toggle field="is_new" label="منتج جديد" />
-            <Toggle field="is_on_sale" label="تخفيض" />
+            <FormToggle label="متوفر في المخزن" checked={form.in_stock} onChange={(v) => set('in_stock', v)} />
+            <FormToggle label="منتج مميز" checked={form.is_featured} onChange={(v) => set('is_featured', v)} />
+            <FormToggle label="منتج جديد" checked={form.is_new} onChange={(v) => set('is_new', v)} />
+            <FormToggle label="تخفيض" checked={form.is_on_sale} onChange={(v) => set('is_on_sale', v)} />
           </div>
 
           {/* Save */}

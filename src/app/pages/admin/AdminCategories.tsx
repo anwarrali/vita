@@ -99,24 +99,24 @@ export function AdminCategories() {
               <label className="block text-xs text-white/50 mb-1">الاسم بالعربية *</label>
               <input value={form.name_ar} onChange={(e) => setForm(f => ({ ...f, name_ar: e.target.value }))}
                 placeholder="مثال: العناية بالبشرة" required
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-all text-right" />
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-colors text-right" />
             </div>
             <div>
               <label className="block text-xs text-white/50 mb-1">الاسم بالإنجليزية</label>
               <input value={form.name} onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Skincare"
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-all" />
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-colors" />
             </div>
             <div>
               <label className="block text-xs text-white/50 mb-1">Slug (اختياري)</label>
               <input value={form.slug} onChange={(e) => setForm(f => ({ ...f, slug: e.target.value }))}
                 placeholder="سيتم توليده تلقائياً"
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-all" />
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-colors" />
             </div>
             <div>
               <label className="block text-xs text-white/50 mb-1">القسم الأب (اختياري)</label>
               <select value={form.parent_id} onChange={(e) => setForm(f => ({ ...f, parent_id: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#292b99] transition-all">
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#292b99] transition-colors">
                 <option value="">— قسم رئيسي —</option>
                 {rootCats.map((c) => <option key={c.id as string} value={c.id as string}>{c.name_ar as string}</option>)}
               </select>
@@ -125,7 +125,7 @@ export function AdminCategories() {
               <label className="block text-xs text-white/50 mb-1">رابط الصورة (اختياري)</label>
               <input value={form.image_url} onChange={(e) => setForm(f => ({ ...f, image_url: e.target.value }))}
                 placeholder="https://..."
-                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-all" />
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#292b99] transition-colors" />
             </div>
             {error && <p className="sm:col-span-2 text-red-400 text-sm">{error}</p>}
             <div className="sm:col-span-2 flex gap-3 justify-end">
