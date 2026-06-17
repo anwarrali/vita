@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="LOGOO.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   inkscape:export-filename="LOGOO.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.48693448"
+     inkscape:cx="309.07649"
+     inkscape:cy="481.5843"
+     inkscape:window-width="1664"
+     inkscape:window-height="981"
+     inkscape:window-x="213"
+     inkscape:window-y="48"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <marker
+       markerWidth="0.63628411"
+       markerHeight="0.99999997"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       id="CapButt"
+       viewBox="0 0 0.63628413 1"
+       inkscape:stockid="Butt cap"
+       style="overflow:visible"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         style="fill:context-stroke;stroke-linecap:butt"
+         d="M 0,-1 H 0.585 C 1.107,-1 1.369,-0.369 1,0 1.369,0.369 1.107,1 0.585,1 H 0 L -0.1,0 Z"
+         sodipodi:nodetypes="sssssscsss"
+         transform="scale(0.5)"
+         id="path64" />
+    </marker>
+    <marker
+       markerWidth="1.04999995"
+       markerHeight="0.99999995"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       id="CapRibbon2"
+       viewBox="0 0 1.05 1"
+       inkscape:stockid="Ribbon cap, rounded"
+       style="overflow:visible"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         style="fill:context-stroke;stroke-linecap:butt"
+         d="M 0,-1 H 2 A 1.11,1.11 90 0 0 2,1 H 0 L -0.1,0 Z"
+         sodipodi:nodetypes="sssssscsss"
+         transform="scale(0.5)"
+         id="path63" />
+    </marker>
+    <linearGradient
+       id="linearGradient11"
+       inkscape:swatch="gradient">
+      <stop
+         style="stop-color:#538a3d;stop-opacity:0;"
+         offset="0"
+         id="stop11" />
+      <stop
+         style="stop-color:#538a3d;stop-opacity:0;"
+         offset="1"
+         id="stop12" />
+    </linearGradient>
+    <rect
+       x="245.41504"
+       y="318.02304"
+       width="367.39648"
+       height="509.70816"
+       id="rect11" />
+    <linearGradient
+       id="swatch8"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#538a3d;stop-opacity:0;"
+         offset="0"
+         id="stop8" />
+    </linearGradient>
+    <inkscape:path-effect
+       effect="powerstroke"
+       message=""
+       id="path-effect32"
+       is_visible="true"
+       lpeversion="1.3"
+       scale_width="1"
+       interpolator_type="CentripetalCatmullRom"
+       interpolator_beta="0.2"
+       start_linecap_type="zerowidth"
+       end_linecap_type="zerowidth"
+       offset_points="15,2541.0249"
+       linejoin_type="round"
+       miter_limit="4"
+       not_jump="false"
+       sort_points="true" />
+    <rect
+       x="715.91488"
+       y="178.61568"
+       width="7.2608"
+       height="20.33024"
+       id="rect24" />
+    <linearGradient
+       id="swatch23"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#6cff15;stop-opacity:1;"
+         offset="0"
+         id="stop24" />
+    </linearGradient>
+    <linearGradient
+       id="swatch2"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#bb3839;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+    </linearGradient>
+    <inkscape:path-effect
+       effect="fill_between_many"
+       method="bsplinespiro"
+       autoreverse="false"
+       close="false"
+       join="false"
+       linkedpaths="#text2,0,1"
+       id="path-effect33" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#swatch2"
+       id="linearGradient33"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.81827347,0,0,0.81827347,-0.65774153,65.035074)"
+       x1="60.905815"
+       y1="131.90074"
+       x2="179.1868"
+       y2="131.90074" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#swatch2"
+       id="linearGradient15"
+       gradientUnits="userSpaceOnUse"
+       x1="247.66406"
+       y1="419.61551"
+       x2="374.41406"
+       y2="419.61551" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       d="m 313.66406,481.44364 h -5.53125 c -2.9375,-9.4375 -7.5625,-22.3125 -13.875,-38.625 l -17.71875,-45.65625 c -5.5,-14.125 -9.34375,-22.9375 -11.53125,-26.4375 -2.125,-3.5 -4.21875,-5.875 -6.28125,-7.125 -2.0625,-1.25 -4.96875,-2.03125 -8.71875,-2.34375 -1.5625,-0.125 -2.34375,-0.6875 -2.34375,-1.6875 0,-1.1875 0.78125,-1.78125 2.34375,-1.78125 h 49.125 c 3.0625,0 4.59375,0.53125 4.59375,1.59375 0,1.375 -1,2.0625 -3,2.0625 -8.25,0 -12.375,3.53125 -12.375,10.59375 0,1.6875 0.375,4.375 1.125,8.0625 0.75,3.6875 2.03125,8.21875 3.84375,13.59375 1.875,5.375 5.84375,16.40625 11.90625,33.09375 6.125,16.625 11.16833,35.03056 12.85583,38.84306 -0.52703,0.91294 2.72575,-2.4514 6.31066,-9.57728 9.89022,-19.65922 17.50875,-41.97858 -9.83793,-23.85719 -1.35686,1.20027 -4.34891,-3.16095 -1.69214,-7.21437 8.81312,-13.44609 48.14296,-38.22109 52.33254,-48.74038 6.65487,-16.70918 -32.73922,-26.60193 -45.48072,4.44041 -2.24526,1.29607 -17.56848,41.69621 -17.57081,40.63372 7.96327,-20.84086 20.08923,-64.18307 44.678,-66.18074 1.47526,-1.27161 28.76532,-1.19568 23.61549,20.58737 -6.43406,17.44848 -63.9781,44.51431 -57.21824,54.15353 3.25149,4.63644 50.72376,-40.00963 0.44482,51.56812 z"
+       id="text11"
+       style="font-size:192px;font-family:'Bell MT';-inkscape-font-specification:'Bell MT';white-space:pre;fill:url(#linearGradient15);stroke-width:16.0815;stroke-dasharray:none;marker-mid:url(#CapButt);marker-end:url(#CapRibbon2);paint-order:stroke fill markers"
+       transform="matrix(0.95571984,0,0,1.1780826,-195.37537,-330.29649)"
+       aria-label="V"
+       sodipodi:nodetypes="cccccscssssssscccscsscsccsc" />
+  </g>
+</svg>

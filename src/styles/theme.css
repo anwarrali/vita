@@ -1,0 +1,436 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  /* Beauty Store Color Palette - Light Mode */
+  --background: #fdfbf9;
+  --foreground: #2d2d2d;
+  --background: #fffcf0;
+  --foreground: #121330;
+  --card: #ffffff;
+  --card-foreground: #2d2d2d;
+  --card-foreground: #121330;
+  --popover: #ffffff;
+  --popover-foreground: #2d2d2d;
+  --primary: #d4a5a5;
+  --primary-foreground: #ffffff;
+  --secondary: #f5e6e8;
+  --secondary-foreground: #2d2d2d;
+  --muted: #f5f5f5;
+  --muted-foreground: #6b6b6b;
+  --accent: #ffd4d4;
+  --accent-foreground: #2d2d2d;
+  --popover-foreground: #121330;
+  --primary: #292b99;
+  --primary-foreground: #fffcf0;
+  --secondary: #f5f2e5;
+  --secondary-foreground: #292b99;
+  --muted: #f0ede0;
+  --muted-foreground: #555670;
+  --accent: #e6e7ff;
+  --accent-foreground: #292b99;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(212, 165, 165, 0.2);
+  --border: rgba(41, 43, 153, 0.15);
+  --input: transparent;
+  --input-background: #fafafa;
+  --switch-background: #d4a5a5;
+  --input-background: #fffdf5;
+  --switch-background: #292b99;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #d4a5a5;
+  --ring: #292b99;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.5rem;
+  /* Beauty Store Custom Variables */
+  --primary-pink: #d4a5a5;
+  --primary-pink-dark: #c08f8f;
+  --primary-pink-light: #e8c7c7;
+  --accent-pink: #ffd4d4;
+  --accent-peach: #ffebe6;
+  --neutral-light: #f9f9f9;
+  --neutral-dark: #2d2d2d;
+  --primary-brand: #292b99;
+  --primary-brand-dark: #1b1d6f;
+  --primary-brand-light: #e6e7ff;
+  --accent-brand: #d1d4ff;
+  --accent-cream: #fffcf0;
+  --neutral-light: #fffdf5;
+  --neutral-dark: #121330;
+  --success: #a8d5ba;
+  --warning: #f4c430;
+  --hero-gradient-from: var(--primary-brand-light);
+  --hero-gradient-to: var(--accent-cream);
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #d4a5a5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: #d4a5a5;
+  --sidebar: #fffcf0;
+  --sidebar-foreground: #121330;
+  --sidebar-primary: #292b99;
+  --sidebar-primary-foreground: #fffcf0;
+  --sidebar-accent: #f5f2e5;
+  --sidebar-accent-foreground: #292b99;
+  --sidebar-border: rgba(41, 43, 153, 0.15);
+  --sidebar-ring: #292b99;
+}
+
+.dark {
+  --background: #1a1a1a;
+  --background: #0f0f1b;
+  --foreground: #f5f5f5;
+  --card: #242424;
+  --card: #16162a;
+  --card-foreground: #f5f5f5;
+  --popover: #242424;
+  --popover: #16162a;
+  --popover-foreground: #f5f5f5;
+  --primary: #d4a5a5;
+  --primary-foreground: #1a1a1a;
+  --secondary: #3a3a3a;
+  --primary: #8c8eff;
+  --primary-foreground: #0f0f1b;
+  --secondary: #1d1e3a;
+  --secondary-foreground: #f5f5f5;
+  --muted: #2d2d2d;
+  --muted-foreground: #a0a0a0;
+  --accent: #4a3a3a;
+  --accent-foreground: #f5f5f5;
+  --muted: #18182b;
+  --muted-foreground: #9ea0bd;
+  --accent: #242555;
+  --accent-foreground: #fffcf0;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(212, 165, 165, 0.3);
+  --input: #2d2d2d;
+  --ring: #d4a5a5;
+  --border: rgba(140, 142, 255, 0.2);
+  --input: #18182b;
+  --ring: #8c8eff;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  /* Beauty Store Custom Variables - Dark Mode */
+  --primary-pink: #d4a5a5;
+  --primary-pink-dark: #c08f8f;
+  --primary-pink-light: #e8c7c7;
+  --accent-pink: #5a4a4a;
+  --accent-peach: #3a2f2d;
+  --neutral-light: #2d2d2d;
+  --primary-brand: #8c8eff;
+  --primary-brand-dark: #6c6eff;
+  --primary-brand-light: #242555;
+  --accent-brand: #242555;
+  --accent-cream: #fffcf0;
+  --neutral-light: #18182b;
+  --neutral-dark: #f5f5f5;
+  --success: #6b9d7a;
+  --warning: #d4a532;
+  --hero-gradient-from: var(--primary-brand-light);
+  --hero-gradient-to: var(--neutral-light);
+  /* Shadows - Dark Mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+  --sidebar: #1a1a1a;
+  --sidebar: #0f0f1b;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #d4a5a5;
+  --sidebar-primary-foreground: #1a1a1a;
+  --sidebar-accent: #2d2d2d;
+  --sidebar-primary: #8c8eff;
+  --sidebar-primary-foreground: #0f0f1b;
+  --sidebar-accent: #1d1e3a;
+  --sidebar-accent-foreground: #f5f5f5;
+  --sidebar-border: #3a3a3a;
+  --sidebar-ring: #d4a5a5;
+  --sidebar-border: #1d1e3a;
+  --sidebar-ring: #8c8eff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /**
+  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+  */
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Premium benefits strip — LTR track math for seamless infinite loop */
+.benefits-marquee {
+  position: relative;
+  overflow: hidden;
+  border-block: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
+  background: color-mix(in srgb, var(--muted) 40%, transparent);
+}
+
+.marquee-viewport {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  min-height: 4.75rem;
+  padding-block: 1.75rem;
+  direction: ltr;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 2%,
+    black 98%,
+    transparent
+  );
+}
+
+.marquee-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: max-content;
+  animation: marquee 160s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.marquee-content {
+  gap: 0;
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 1.75rem;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .marquee-viewport {
+    min-height: 5.25rem;
+    padding-block: 2rem;
+  }
+
+  .marquee-item {
+    padding-inline: 2.25rem;
+    font-size: 1.25rem;
+  }
+}
+
+.marquee-check {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+@media (min-width: 768px) {
+  .marquee-check {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.marquee-separator {
+  flex-shrink: 0;
+  padding-inline: 0.25rem;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--primary) 35%, transparent);
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    padding-inline: 1rem;
+  }
+
+  .marquee-viewport {
+    mask-image: none;
+  }
+
+  .marquee-track > .marquee-content:nth-child(n + 2) {
+    display: none;
+  }
+
+  .marquee-content {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 0;
+  }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
