@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { Logo } from '../Logo';
+import { ScrollToTop } from '../ScrollToTop';
 import {
   LayoutDashboard,
   Package,
@@ -88,6 +89,7 @@ export function AdminLayout() {
 
   return (
     <div className="admin-layout flex min-h-dvh md:h-dvh md:max-h-dvh md:overflow-hidden bg-[#0a0a14] text-white" dir="rtl">
+      <ScrollToTop />
       <div className="hidden md:flex">
         <AdminSidebar onLogout={logout} />
       </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -7,7 +7,7 @@ import { ProductCard } from '../components/ProductCard';
 import { ProductImageGallery } from '../components/ProductImageGallery';
 import { useCart } from '../context/CartContext';
 import { useProduct, useProducts } from '../lib/useProducts';
-import { returnPolicy, shippingInfo } from '../data/storePolicies';
+import { shippingInfo } from '../data/storePolicies';
 import {
   getProductImages,
   getItemUnitPrice,
@@ -76,6 +76,12 @@ export function ProductDetails() {
   const { data: allProducts } = useProducts();
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setQuantity(1);
+    setSelectedOptions({});
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [id]);
 
   const relatedProducts = useMemo(
     () =>
@@ -324,18 +330,6 @@ export function ProductDetails() {
             </CardContent>
           </Card>
         </div>
-
-        <Card className="mb-16">
-          <CardContent className="p-6">
-            <h2 className="font-bold text-lg mb-4">{returnPolicy.title}</h2>
-            <p className="text-sm text-muted-foreground mb-4">{returnPolicy.intro}</p>
-            <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
-              {returnPolicy.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
 
         {relatedProducts.length > 0 && (
           <div>

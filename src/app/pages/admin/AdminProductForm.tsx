@@ -278,14 +278,24 @@ export function AdminProductForm() {
   async function uploadFiles(files: FileList | File[]) {
     const list = Array.from(files);
     if (list.length === 0) return;
+    setError('');
     setUploading(true);
     const uploaded: string[] = [];
 
     for (const file of list) {
-      const path = `products/${Date.now()}_${Math.random().toString(36).slice(2)}_${file.name}`;
-      const { error: upErr } = await supabase.storage.from('product-images').upload(path, file);
+      const safeName = file.name
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9._-]/g, '');
+      const extension = safeName.includes('.') ? '' : '.jpg';
+      const path = `products/${Date.now()}_${Math.random().toString(36).slice(2)}_${safeName || 'image'}${extension}`;
+      const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type || undefined,
+      });
       if (upErr) {
-        setError('فشل رفع الصورة: ' + upErr.message);
+        setError(`فشل رفع الصورة (${file.name}): ${upErr.message}`);
         break;
       }
       const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(path);
@@ -599,9 +609,9 @@ export function AdminProductForm() {
                         </button>
                       </div>
                       <input
-                        type="url"
+                        type="text"
                         value={option.imageUrl ?? ''}
-                        onChange={(e) => updateVariantOption(vi, oi, { imageUrl: e.target.value || undefined })}
+                        onChange={(e) => updateVariantOption(vi, oi, { imageUrl: e.target.value.trim() || undefined })}
                         placeholder="رابط صورة الخيار (اختياري — مفيد للدرجات والألوان)"
                         dir="ltr"
                         className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
