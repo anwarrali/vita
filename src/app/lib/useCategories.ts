@@ -1,12 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from './supabase';
+import {
+  fetchCategoryProductImageMap,
+  resolveCategoryImage,
+} from './categoryImages';
 import type { Category } from '../types';
 
-function mapCategoryRows(rows: Record<string, unknown>[]): Category[] {
+function mapCategoryRows(
+  rows: Record<string, unknown>[],
+  productImages: Map<string, string>
+): Category[] {
   const rootRows = rows.filter((r) => !r.parent_id);
   return rootRows.map((root) => {
+    const rootId = root.id as string;
     const subs = rows
-      .filter((r) => r.parent_id === root.id)
+      .filter((r) => r.parent_id === rootId)
       .map((r) => ({
         id: r.id as string,
         name: (r.name as string) || '',
@@ -14,12 +22,28 @@ function mapCategoryRows(rows: Record<string, unknown>[]): Category[] {
         slug: (r.slug as string) || '',
       }));
 
+    let image = resolveCategoryImage(
+      rootId,
+      root.image_url as string | undefined,
+      productImages
+    );
+
+    if (!image && subs.length > 0) {
+      for (const sub of subs) {
+        const subImage = productImages.get(sub.id) ?? productImages.get(sub.slug);
+        if (subImage) {
+          image = subImage;
+          break;
+        }
+      }
+    }
+
     return {
-      id: root.id as string,
+      id: rootId,
       name: (root.name as string) || '',
       nameAr: (root.name_ar as string) || '',
       slug: (root.slug as string) || '',
-      image: (root.image_url as string) || '',
+      image,
       subcategories: subs,
     };
   });
@@ -36,14 +60,20 @@ export function useCategories() {
       setLoading(true);
       setError(null);
       try {
-        const { data: rows, error: err } = await supabase
-          .from('categories')
-          .select('*')
-          .order('name');
+        const [categoriesRes, productImages] = await Promise.all([
+          supabase.from('categories').select('*').order('name'),
+          fetchCategoryProductImageMap(),
+        ]);
 
         if (cancelled) return;
-        if (err) throw err;
-        setData(mapCategoryRows((rows ?? []) as Record<string, unknown>[]));
+        if (categoriesRes.error) throw categoriesRes.error;
+
+        setData(
+          mapCategoryRows(
+            (categoriesRes.data ?? []) as Record<string, unknown>[],
+            productImages
+          )
+        );
       } catch (e) {
         if (!cancelled) {
           setData([]);
@@ -74,14 +104,14 @@ export function useCategory(slug: string) {
       setLoading(true);
       setError(null);
       try {
-        const { data: row, error: err } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('slug', slug)
-          .single();
+        const [rowRes, productImages] = await Promise.all([
+          supabase.from('categories').select('*').eq('slug', slug).single(),
+          fetchCategoryProductImageMap(),
+        ]);
 
         if (cancelled) return;
-        if (err) throw err;
+        if (rowRes.error) throw rowRes.error;
+        const row = rowRes.data;
 
         const { data: children } = await supabase
           .from('categories')
@@ -90,12 +120,19 @@ export function useCategory(slug: string) {
 
         if (cancelled) return;
 
+        const rootId = row.parent_id ? String(row.parent_id) : String(row.id);
+        const image = resolveCategoryImage(
+          rootId,
+          row.image_url as string | undefined,
+          productImages
+        );
+
         setData({
           id: row.id as string,
           name: (row.name as string) || '',
           nameAr: (row.name_ar as string) || '',
           slug: (row.slug as string) || '',
-          image: (row.image_url as string) || '',
+          image,
           subcategories: (children ?? []).map((r) => ({
             id: r.id as string,
             name: (r.name as string) || '',

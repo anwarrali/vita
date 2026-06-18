@@ -5,6 +5,7 @@ import { useAdminCategories } from '../../lib/useCategories';
 import type { ProductVariant, ProductVariantType } from '../../types';
 import { syncInventoryOnSave } from '../../lib/inventory';
 import { buildInventoryPayload } from '../../lib/adminRestock';
+import { syncCategoryImageFromProduct, getFirstProductImage } from '../../lib/categoryImages';
 import {
   Save, ArrowRight, ImagePlus, Upload, X, Loader2, CheckCircle2, Plus,
   ChevronUp, ChevronDown, Star, PackagePlus,
@@ -447,6 +448,12 @@ export function AdminProductForm() {
       );
       return;
     }
+
+    const firstImage = getFirstProductImage(form.images);
+    if (firstImage && form.category) {
+      void syncCategoryImageFromProduct(form.category, firstImage);
+    }
+
     setSuccess(true);
     setTimeout(() => navigate('/admin/products'), 1200);
   }
