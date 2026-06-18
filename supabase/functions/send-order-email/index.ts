@@ -1,31 +1,52 @@
-import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { getCorsHeaders, jsonResponse } from '../_shared/cors.ts';
 import { logEmailEvent } from '../_shared/email-logs.ts';
+import { checkRequestAuth, orderExists } from './auth.ts';
 import { getAdminEmail, sendWithResend } from './resend.ts';
 import { buildOrderEmailHtml, ORDER_EMAIL_SUBJECT } from './template.ts';
 import { parseOrderEmailPayload } from './validate.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: getCorsHeaders(req) });
   }
 
   if (req.method !== 'POST') {
-    return jsonResponse({ error: 'Method not allowed' }, 405);
+    return jsonResponse(req, { ok: false, error: 'Method not allowed' }, 405);
+  }
+
+  const auth = checkRequestAuth(req);
+  console.log('[send-order-email] auth:', auth.ok ? 'credentials-present' : auth.reason);
+
+  if (!auth.ok) {
+    return jsonResponse(req, { ok: false, error: auth.reason }, 401);
   }
 
   let orderId: string | undefined;
 
   try {
     const body = await req.json().catch(() => null);
-    const order = parseOrderEmailPayload(body);
+    console.log('[send-order-email] payload received:', JSON.stringify(body));
 
-    if (!order) {
-      return jsonResponse({ error: 'Invalid order payload' }, 400);
+    const parsed = parseOrderEmailPayload(body);
+
+    if (!parsed.ok) {
+      console.error('[send-order-email] validation failed:', parsed.errors);
+      return jsonResponse(req, { ok: false, error: 'Invalid order payload', details: parsed.errors }, 400);
     }
 
+    const order = parsed.data;
     orderId = order.orderId;
+
+    const exists = await orderExists(order.orderId);
+    if (!exists) {
+      console.error('[send-order-email] order not found:', order.orderId);
+      return jsonResponse(req, { ok: false, error: 'Order not found' }, 404);
+    }
+
     const adminEmail = getAdminEmail();
     const html = buildOrderEmailHtml(order);
+
+    console.log('[send-order-email] sending via Resend to:', adminEmail);
 
     const messageId = await sendWithResend({
       to: adminEmail,
@@ -33,15 +54,22 @@ Deno.serve(async (req) => {
       html,
     });
 
-    await logEmailEvent({
-      orderId: order.orderId,
-      emailType: 'admin_new_order',
-      recipient: adminEmail,
-      provider: 'resend',
-      status: 'sent',
-    });
+    console.log('[send-order-email] Resend success:', messageId);
 
-    return jsonResponse({
+    // Logging must never fail the response after a successful send
+    try {
+      await logEmailEvent({
+        orderId: order.orderId,
+        emailType: 'admin_new_order',
+        recipient: adminEmail,
+        provider: 'resend',
+        status: 'sent',
+      });
+    } catch (logError) {
+      console.error('[send-order-email] log success failed (email was sent):', logError);
+    }
+
+    return jsonResponse(req, {
       ok: true,
       orderId: order.orderId,
       messageId,
@@ -61,10 +89,10 @@ Deno.serve(async (req) => {
           errorMessage: message,
         });
       } catch (logError) {
-        console.error('[send-order-email] failed to log error:', logError);
+        console.error('[send-order-email] log failure failed:', logError);
       }
     }
 
-    return jsonResponse({ ok: false, error: message }, 500);
+    return jsonResponse(req, { ok: false, error: message }, 500);
   }
 });

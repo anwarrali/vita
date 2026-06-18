@@ -36,7 +36,12 @@ export function ProductListing() {
 
     // Apply URL filters
     if (categoryFromUrl) {
-      filtered = filtered.filter((p) => p.category === categoryFromUrl);
+      filtered = filtered.filter(
+        (p) =>
+          p.category === categoryFromUrl ||
+          p.subcategory === categoryFromUrl ||
+          p.category === categoryFromUrl.replace(/-/g, '_')
+      );
     }
     if (subcategoryFromUrl) {
       filtered = filtered.filter((p) => p.subcategory === subcategoryFromUrl);

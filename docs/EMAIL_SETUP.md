@@ -24,6 +24,19 @@ Resend API → ADMIN_EMAIL
 - Order save always succeeds even if email fails
 - Failures logged to `email_logs`
 
+### Auth note (important)
+
+This store uses **guest checkout** with Supabase **publishable keys** (`sb_publishable_...`).
+These are not user JWTs. The Edge Function must use:
+
+```toml
+[functions.send-order-email]
+verify_jwt = false
+```
+
+Without this, the gateway returns **401 Invalid JWT** before your function runs.
+Security is handled by requiring `apikey`/`authorization` headers and verifying the order exists in the database.
+
 ---
 
 ## 1. Database setup
@@ -83,8 +96,12 @@ supabase secrets set FROM_NAME="Vita Shop"
 npm install -g supabase
 supabase login
 supabase link --project-ref YOUR_PROJECT_REF
-supabase functions deploy send-order-email
+supabase functions deploy send-order-email --no-verify-jwt
 ```
+
+Or ensure `supabase/config.toml` has `verify_jwt = false`.
+
+**Dashboard:** Edge Functions → `send-order-email` → disable "Enforce JWT Verification" if 401 persists.
 
 ---
 

@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CartItem, Product, SelectedVariant } from '../types';
 import { getCartLineKey, getCartItemUnitPrice } from '../lib/productUtils';
+import { getAvailableStock, isProductPurchasable } from '../lib/inventory';
+import { shouldEnforceStockLimits } from '../lib/productInventory';
+import { toast } from 'sonner';
 
 interface CartContextType {
   cart: CartItem[];
@@ -46,10 +49,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     quantity: number = 1,
     selectedVariants: SelectedVariant[] = []
   ) => {
+    if (!product.isActive) {
+      toast.error('هذا المنتج غير متاح حالياً');
+      return;
+    }
+
+    if (product.variants?.length && selectedVariants.length !== product.variants.length) {
+      toast.error('يرجى اختيار جميع خيارات المنتج');
+      return;
+    }
+
+    if (!isProductPurchasable(product, selectedVariants)) {
+      toast.error('هذا المنتج غير متوفر في المخزون');
+      return;
+    }
+
+    const available = getAvailableStock(product, selectedVariants);
     const lineKey = getCartLineKey(product.id, selectedVariants);
+    const enforceStock = shouldEnforceStockLimits(product);
+
     setCart((prev) => {
-      const existing = prev.find((item) => item.lineKey === lineKey);
-      if (existing) {
+      const existingItem = prev.find((item) => item.lineKey === lineKey);
+      const nextQty = (existingItem?.quantity ?? 0) + quantity;
+
+      if (enforceStock && nextQty > available) {
+        toast.error(`المتوفر في المخزون: ${available} قطعة فقط`);
+        return prev;
+      }
+
+      if (existingItem) {
         return prev.map((item) =>
           item.lineKey === lineKey
             ? { ...item, quantity: item.quantity + quantity }
@@ -69,9 +97,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart(lineKey);
       return;
     }
-    setCart((prev) =>
-      prev.map((item) => (item.lineKey === lineKey ? { ...item, quantity } : item))
-    );
+    setCart((prev) => {
+      const item = prev.find((entry) => entry.lineKey === lineKey);
+      if (item && shouldEnforceStockLimits(item.product)) {
+        const available = getAvailableStock(item.product, item.selectedVariants);
+        if (quantity > available) {
+          toast.error(`المتوفر في المخزون: ${available} قطعة فقط`);
+          return prev;
+        }
+      }
+      return prev.map((entry) => (entry.lineKey === lineKey ? { ...entry, quantity } : entry));
+    });
   };
 
   const clearCart = () => {

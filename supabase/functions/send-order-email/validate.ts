@@ -1,70 +1,129 @@
 import type { OrderEmailPayload } from './types.ts';
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const PHONE_RE = /^[\d\s+()-]{7,20}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function isNonEmptyString(value: unknown, maxLength: number): value is string {
-  return typeof value === 'string' && value.trim().length > 0 && value.trim().length <= maxLength;
+export type ParseResult =
+  | { ok: true; data: OrderEmailPayload }
+  | { ok: false; errors: string[] };
+
+function toNumber(value: unknown, field: string, errors: string[]): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) {
+    return Number(value);
+  }
+  errors.push(`${field} must be a valid number`);
+  return null;
 }
 
-function isMoney(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value) && value >= 0;
-}
-
-function parseItem(value: unknown): OrderEmailPayload['items'][number] | null {
-  if (!value || typeof value !== 'object') return null;
-  const item = value as Record<string, unknown>;
-
-  if (!isNonEmptyString(item.name, 300)) return null;
-  if (typeof item.quantity !== 'number' || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 999) {
+function toInt(value: unknown, field: string, errors: string[]): number | null {
+  const num = toNumber(value, field, errors);
+  if (num === null) return null;
+  const int = Math.round(num);
+  if (int < 1) {
+    errors.push(`${field} must be at least 1`);
     return null;
   }
-  if (!isMoney(item.unitPrice) || !isMoney(item.totalPrice)) return null;
-
-  return {
-    name: item.name.trim(),
-    quantity: item.quantity,
-    unitPrice: item.unitPrice,
-    totalPrice: item.totalPrice,
-  };
+  return int;
 }
 
-export function parseOrderEmailPayload(body: unknown): OrderEmailPayload | null {
-  if (!body || typeof body !== 'object') return null;
+function toString(value: unknown, field: string, errors: string[], max = 500): string | null {
+  if (typeof value !== 'string' || !value.trim()) {
+    errors.push(`${field} is required`);
+    return null;
+  }
+  const trimmed = value.trim();
+  if (trimmed.length > max) {
+    errors.push(`${field} is too long`);
+    return null;
+  }
+  return trimmed;
+}
+
+export function parseOrderEmailPayload(body: unknown): ParseResult {
+  const errors: string[] = [];
+
+  if (!body || typeof body !== 'object') {
+    return { ok: false, errors: ['Request body must be a JSON object'] };
+  }
+
   const data = body as Record<string, unknown>;
 
-  if (!isNonEmptyString(data.orderId, 64) || !UUID_RE.test(data.orderId.trim())) return null;
-  if (!isNonEmptyString(data.customerName, 120)) return null;
-  if (!isNonEmptyString(data.phone, 30) || !PHONE_RE.test(data.phone.trim())) return null;
-  if (!isNonEmptyString(data.address, 500)) return null;
-  if (!isNonEmptyString(data.region, 50)) return null;
-  if (!isNonEmptyString(data.regionLabel, 120)) return null;
-  if (!isMoney(data.subtotal) || !isMoney(data.shippingCost) || !isMoney(data.total)) return null;
-
-  if (!Array.isArray(data.items) || data.items.length === 0 || data.items.length > 100) {
-    return null;
+  const orderId = toString(data.orderId, 'orderId', errors, 64);
+  if (orderId && !UUID_RE.test(orderId)) {
+    errors.push('orderId must be a valid UUID');
   }
 
-  const items = data.items.map(parseItem).filter((item): item is OrderEmailPayload['items'][number] => item !== null);
-  if (items.length !== data.items.length) return null;
+  const customerName = toString(data.customerName, 'customerName', errors, 120);
+  const phone = toString(data.phone, 'phone', errors, 30);
+  const address = toString(data.address, 'address', errors, 500);
+  const region = toString(data.region, 'region', errors, 50);
+  const regionLabel = toString(data.regionLabel, 'regionLabel', errors, 120);
 
-  const notes = data.notes == null
-    ? null
-    : typeof data.notes === 'string'
-      ? data.notes.trim().slice(0, 1000) || null
-      : null;
+  const subtotal = toNumber(data.subtotal, 'subtotal', errors);
+  const shippingCost = toNumber(data.shippingCost, 'shippingCost', errors);
+  const total = toNumber(data.total, 'total', errors);
+
+  if (subtotal !== null && subtotal < 0) errors.push('subtotal cannot be negative');
+  if (shippingCost !== null && shippingCost < 0) errors.push('shippingCost cannot be negative');
+  if (total !== null && total < 0) errors.push('total cannot be negative');
+
+  let notes: string | null = null;
+  if (data.notes != null && data.notes !== '') {
+    if (typeof data.notes !== 'string') {
+      errors.push('notes must be a string');
+    } else {
+      notes = data.notes.trim().slice(0, 1000) || null;
+    }
+  }
+
+  const items: OrderEmailPayload['items'] = [];
+  if (!Array.isArray(data.items) || data.items.length === 0) {
+    errors.push('items must be a non-empty array');
+  } else if (data.items.length > 100) {
+    errors.push('items cannot exceed 100 entries');
+  } else {
+    data.items.forEach((raw, index) => {
+      if (!raw || typeof raw !== 'object') {
+        errors.push(`items[${index}] must be an object`);
+        return;
+      }
+      const item = raw as Record<string, unknown>;
+      const name = toString(item.name, `items[${index}].name`, errors, 300);
+      const quantity = toInt(item.quantity, `items[${index}].quantity`, errors);
+      const unitPrice = toNumber(item.unitPrice, `items[${index}].unitPrice`, errors);
+      const totalPrice = toNumber(item.totalPrice, `items[${index}].totalPrice`, errors);
+
+      if (name && quantity && unitPrice !== null && totalPrice !== null) {
+        items.push({
+          name,
+          quantity,
+          unitPrice: Math.round(unitPrice * 100) / 100,
+          totalPrice: Math.round(totalPrice * 100) / 100,
+        });
+      }
+    });
+  }
+
+  if (errors.length > 0) {
+    return { ok: false, errors };
+  }
 
   return {
-    orderId: data.orderId.trim(),
-    customerName: data.customerName.trim(),
-    phone: data.phone.trim(),
-    address: data.address.trim(),
-    region: data.region.trim(),
-    regionLabel: data.regionLabel.trim(),
-    notes,
-    items,
-    subtotal: data.subtotal,
-    shippingCost: data.shippingCost,
-    total: data.total,
+    ok: true,
+    data: {
+      orderId: orderId!,
+      customerName: customerName!,
+      phone: phone!,
+      address: address!,
+      region: region!,
+      regionLabel: regionLabel!,
+      notes,
+      items,
+      subtotal: Math.round(subtotal! * 100) / 100,
+      shippingCost: Math.round(shippingCost! * 100) / 100,
+      total: Math.round(total! * 100) / 100,
+    },
   };
 }

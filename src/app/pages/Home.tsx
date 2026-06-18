@@ -9,7 +9,7 @@ import { useCategories } from '../lib/useCategories';
 import { useProducts } from '../lib/useProducts';
 import { ShoppingBag, Loader2 } from 'lucide-react';
 
-const storeCategories = ['مكياج', 'عناية بالبشرة', 'عطور', 'إكسسوارات', 'حقائب'];
+const storeCategories = ['مكياج', 'عناية بالبشرة', 'عطور', 'إكسسوارات', 'ساعات', 'نظارات', 'حقائب'];
 
 export function Home() {
   const { data: categories, loading: categoriesLoading } = useCategories();

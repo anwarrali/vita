@@ -1,4 +1,7 @@
 import type { CartItem, Product, SelectedVariant } from '../types';
+import { getAvailableStock, getProductStockStatus } from './inventory';
+
+export { getAvailableStock, getProductStockStatus };
 
 export function getProductImages(product: Product): string[] {
   if (product.images.length > 0) return product.images;

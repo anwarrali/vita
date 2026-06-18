@@ -1,7 +1,4 @@
-# Supabase local development config
-
-[api]
-enabled = true
-
+# Guest checkout uses publishable/anon keys (not user JWTs).
+# verify_jwt must be false to avoid 401 "Invalid JWT format".
 [functions.send-order-email]
-verify_jwt = true
+verify_jwt = false

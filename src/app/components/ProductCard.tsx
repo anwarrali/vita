@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent, CardFooter } from './ui/card';
 import { useCart } from '../context/CartContext';
+import { getProductStockStatus, isProductPurchasable, STOCK_STATUS_LABELS } from '../lib/inventory';
 import { toast } from 'sonner';
 
 interface ProductCardProps {
@@ -13,9 +14,16 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const stockStatus = getProductStockStatus(product);
+  const hasVariants = Boolean(product.variants?.length);
+  const canQuickAdd = !hasVariants && isProductPurchasable(product);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (hasVariants) {
+      toast.info('يرجى اختيار الخيارات من صفحة المنتج');
+      return;
+    }
     addToCart(product);
     toast.success('تمت الإضافة إلى السلة');
   };
@@ -29,8 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
             alt={product.nameAr}
             className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
           />
-          
-          {/* Badges */}
+
           <div className="absolute top-2 right-2 flex flex-col gap-2">
             {product.isNew && (
               <Badge className="bg-success text-white">جديد</Badge>
@@ -38,14 +45,14 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.isOnSale && (
               <Badge variant="destructive">تخفيض</Badge>
             )}
+            {stockStatus === 'low_stock' && (
+              <Badge className="bg-amber-500 text-white">مخزون منخفض</Badge>
+            )}
           </div>
 
-
-
-          {/* Out of Stock Overlay */}
-          {!product.inStock && (
+          {stockStatus === 'out_of_stock' && (
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-              <span className="text-white font-bold">غير متوفر</span>
+              <span className="text-white font-bold">{STOCK_STATUS_LABELS.out_of_stock}</span>
             </div>
           )}
         </div>
@@ -54,8 +61,6 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className="font-medium mb-1 line-clamp-2 min-h-[3rem]">
             {product.nameAr}
           </h3>
-          
-
 
           <div className="flex items-center gap-2">
             <span className="text-lg font-bold text-primary">
@@ -74,10 +79,10 @@ export function ProductCard({ product }: ProductCardProps) {
         <Button
           className="w-full"
           onClick={handleAddToCart}
-          disabled={!product.inStock}
+          disabled={!canQuickAdd}
         >
           <ShoppingCart className="ml-2 h-4 w-4" />
-          أضف إلى السلة
+          {hasVariants ? 'اختر الخيارات' : canQuickAdd ? 'أضف إلى السلة' : STOCK_STATUS_LABELS.out_of_stock}
         </Button>
       </CardFooter>
     </Card>

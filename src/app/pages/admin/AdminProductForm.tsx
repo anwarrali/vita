@@ -3,9 +3,11 @@ import { useNavigate, useParams } from 'react-router';
 import { supabase } from '../../lib/supabase';
 import { useAdminCategories } from '../../lib/useCategories';
 import type { ProductVariant, ProductVariantType } from '../../types';
+import { syncInventoryOnSave } from '../../lib/inventory';
+import { buildInventoryPayload } from '../../lib/adminRestock';
 import {
   Save, ArrowRight, ImagePlus, Upload, X, Loader2, CheckCircle2, Plus,
-  ChevronUp, ChevronDown, Star,
+  ChevronUp, ChevronDown, Star, PackagePlus,
 } from 'lucide-react';
 
 interface FormState {
@@ -19,7 +21,10 @@ interface FormState {
   category: string;
   category_slug: string;
   brand: string;
+  stock_quantity: string;
   in_stock: boolean;
+  is_active: boolean;
+  restock_show_in_store: boolean;
   is_featured: boolean;
   is_new: boolean;
   is_on_sale: boolean;
@@ -54,7 +59,10 @@ const EMPTY: FormState = {
   category: '',
   category_slug: '',
   brand: '',
+  stock_quantity: '5',
   in_stock: true,
+  is_active: true,
+  restock_show_in_store: true,
   is_featured: false,
   is_new: false,
   is_on_sale: false,
@@ -140,6 +148,7 @@ export function AdminProductForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loadingForm, setLoadingForm] = useState(isEdit);
+  const [loadedOutOfStock, setLoadedOutOfStock] = useState(false);
 
   // Load existing product for edit
   useEffect(() => {
@@ -148,6 +157,9 @@ export function AdminProductForm() {
       const { data, error: err } = await supabase.from('products').select('*').eq('id', id).single();
       if (err || !data) { navigate('/admin/products'); return; }
       const r = data as Record<string, unknown>;
+      const stockQty = r.stock_quantity != null ? Number(r.stock_quantity) : null;
+      const inStock = r.in_stock == null ? true : Boolean(r.in_stock);
+      setLoadedOutOfStock(!inStock);
       setForm({
         id: String(r.id ?? ''),
         name: String(r.name ?? ''),
@@ -159,7 +171,10 @@ export function AdminProductForm() {
         category: String(r.category ?? ''),
         category_slug: String(r.category_slug ?? ''),
         brand: String(r.brand ?? ''),
-        in_stock: Boolean(r.in_stock),
+        stock_quantity: stockQty != null ? String(stockQty) : '0',
+        in_stock: inStock,
+        is_active: r.is_active == null ? true : Boolean(r.is_active),
+        restock_show_in_store: true,
         is_featured: Boolean(r.is_featured),
         is_new: Boolean(r.is_new),
         is_on_sale: Boolean(r.is_on_sale),
@@ -170,6 +185,37 @@ export function AdminProductForm() {
     }
     load();
   }, [id, isEdit, navigate]);
+
+  function applyQuickRestock(quantity: number) {
+    if (form.variants.length === 0) {
+      setForm((prev) => ({
+        ...prev,
+        stock_quantity: String(Math.max(0, quantity)),
+        in_stock: quantity > 0 ? true : prev.in_stock,
+        restock_show_in_store: true,
+      }));
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      in_stock: true,
+      variants: prev.variants.map((variant) => ({
+        ...variant,
+        options: variant.options.map((option) => ({
+          ...option,
+          stockQuantity: Math.max(0, quantity),
+          inStock: quantity > 0,
+        })),
+      })),
+      restock_show_in_store: true,
+    }));
+  }
+
+  useEffect(() => {
+    if (window.location.hash === '#stock' && !loadingForm) {
+      document.getElementById('stock')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [loadingForm]);
 
   function set(field: keyof FormState, value: unknown) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -211,7 +257,7 @@ export function AdminProductForm() {
         name: preset.name,
         nameAr: preset.nameAr,
         type,
-        options: [{ id: `opt-${Date.now()}`, label: 'Option', labelAr: 'خيار', inStock: true }],
+        options: [{ id: `opt-${Date.now()}`, label: 'Option', labelAr: 'خيار', stockQuantity: 5, inStock: true }],
       },
     ]);
   }
@@ -236,7 +282,7 @@ export function AdminProductForm() {
               ...v,
               options: [
                 ...v.options,
-                { id: `opt-${Date.now()}`, label: 'Option', labelAr: 'خيار', inStock: true },
+                { id: `opt-${Date.now()}`, label: 'Option', labelAr: 'خيار', stockQuantity: 5, inStock: true },
               ],
             }
           : v
@@ -333,6 +379,21 @@ export function AdminProductForm() {
     if (!form.price) { setError('السعر مطلوب'); return; }
     if (form.images.length === 0) { setError('أضف صورة واحدة على الأقل'); return; }
 
+    const baseStock = parseInt(form.stock_quantity, 10);
+    if (Number.isNaN(baseStock) || baseStock < 0) {
+      setError('كمية المخزون يجب أن تكون رقمًا صحيحًا أكبر من أو يساوي صفر');
+      return;
+    }
+
+    const restocking = loadedOutOfStock && form.in_stock;
+    const inventoryFields = buildInventoryPayload({
+      stockQuantity: baseStock,
+      variants: form.variants,
+      inStock: form.in_stock,
+      isActive: form.is_active,
+      forceVisibleOnRestock: restocking && form.restock_show_in_store,
+    });
+
     setSaving(true);
     const payload = {
       name: form.name || form.name_ar,
@@ -345,11 +406,13 @@ export function AdminProductForm() {
       category_slug: form.category_slug || null,
       brand: form.brand || null,
       images: form.images,
-      in_stock: form.in_stock,
+      stock_quantity: inventoryFields.stock_quantity,
+      in_stock: inventoryFields.in_stock,
+      is_active: inventoryFields.is_active,
       is_featured: form.is_featured,
       is_new: form.is_new,
       is_on_sale: form.is_on_sale,
-      variants: form.variants,
+      variants: inventoryFields.variants,
     };
 
     let err;
@@ -362,8 +425,28 @@ export function AdminProductForm() {
       }));
     }
 
+    if (err && (err.message.includes('stock_quantity') || err.message.includes('is_active'))) {
+      const { stock_quantity: _sq, is_active: _ia, ...legacyPayload } = payload;
+      // legacyPayload keeps in_stock + variants
+      if (isEdit) {
+        ({ error: err } = await supabase.from('products').update(legacyPayload).eq('id', id));
+      } else {
+        ({ error: err } = await supabase.from('products').insert({
+          id: generateId(form.name_ar, form.category),
+          ...legacyPayload,
+        }));
+      }
+    }
+
     setSaving(false);
-    if (err) { setError(err.message); return; }
+    if (err) {
+      setError(
+        err.message.includes('stock_quantity') || err.message.includes('is_active')
+          ? `${err.message} — شغّل inventory_migration.sql في Supabase SQL Editor`
+          : err.message
+      );
+      return;
+    }
     setSuccess(true);
     setTimeout(() => navigate('/admin/products'), 1200);
   }
@@ -507,6 +590,89 @@ export function AdminProductForm() {
             </div>
           </div>
 
+          {/* Inventory */}
+          <div id="stock" className="bg-[#0f0f1b] border border-white/10 rounded-2xl p-6 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-white/40 uppercase tracking-widest">المخزون</h3>
+            </div>
+
+            {/* Manual in/out of stock — independent of quantity */}
+            <div className="rounded-xl border border-white/10 p-4 space-y-3">
+              <p className="text-sm text-white/70 font-medium">حالة التوفر في المتجر</p>
+              <p className="text-xs text-white/40">
+                اختاري يدوياً متوفر أو نفد المخزون. عند نفاد الكمية من الطلبات يُعاد تلقائياً إلى نفد المخزون.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => set('in_stock', true)}
+                  className={`min-h-11 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    form.in_stock
+                      ? 'bg-emerald-500/25 text-emerald-200 border-2 border-emerald-500/50'
+                      : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  ✓ متوفر
+                </button>
+                <button
+                  type="button"
+                  onClick={() => set('in_stock', false)}
+                  className={`min-h-11 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    !form.in_stock
+                      ? 'bg-red-500/25 text-red-200 border-2 border-red-500/50'
+                      : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  ✕ نفد المخزون
+                </button>
+              </div>
+            </div>
+
+            {!form.in_stock && (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                المنتج مخفي كـ «نفد المخزون». اضغطي «متوفر» أو زيدي الكمية واحفظي.
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs text-white/40 w-full mb-1">تجديد سريع:</span>
+              {[5, 10, 20].map((qty) => (
+                <button
+                  key={qty}
+                  type="button"
+                  onClick={() => applyQuickRestock(qty)}
+                  className="inline-flex items-center gap-1.5 min-h-11 px-4 py-2 rounded-xl bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 text-sm transition-colors"
+                >
+                  <PackagePlus className="h-4 w-4" />
+                  {qty} قطعة
+                </button>
+              ))}
+            </div>
+
+            {form.variants.length === 0 ? (
+              <FormInput
+                label="كمية المخزون"
+                value={form.stock_quantity}
+                onChange={(v) => set('stock_quantity', v)}
+                type="number"
+                placeholder="0"
+                required
+              />
+            ) : (
+              <p className="text-sm text-white/50">
+                عدّلي كمية كل خيار (لون / مقاس...) أدناه. أي كمية أكبر من 0 تعيد المنتج للمخزون.
+              </p>
+            )}
+
+            {(loadedOutOfStock || !form.is_active) && form.in_stock && (
+              <FormToggle
+                label="إظهار المنتج في المتجر بعد التجديد"
+                checked={form.restock_show_in_store}
+                onChange={(v) => set('restock_show_in_store', v)}
+              />
+            )}
+          </div>
+
           {/* Variants */}
           <div className="bg-[#0f0f1b] border border-white/10 rounded-2xl p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
@@ -595,15 +761,21 @@ export function AdminProductForm() {
                           placeholder="±₪"
                           className="w-20 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
                         />
-                        <label className="flex items-center gap-1.5 text-xs text-white/60 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={option.inStock !== false}
-                            onChange={(e) => updateVariantOption(vi, oi, { inStock: e.target.checked })}
-                            className="rounded"
-                          />
-                          متوفر
-                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={option.stockQuantity ?? 0}
+                          onChange={(e) => {
+                            const stockQuantity = Math.max(0, parseInt(e.target.value, 10) || 0);
+                            updateVariantOption(vi, oi, {
+                              stockQuantity,
+                              inStock: stockQuantity > 0,
+                            });
+                          }}
+                          placeholder="كمية"
+                          title="كمية المخزون — 0 = نفد، أي رقم أكبر يعيد التوفر"
+                          className="w-24 min-h-11 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
+                        />
                         <button type="button" onClick={() => removeVariantOption(vi, oi)} className="text-red-400 p-1 ml-auto" title="حذف القيمة">
                           <X className="h-3.5 w-3.5" />
                         </button>
@@ -678,7 +850,7 @@ export function AdminProductForm() {
           {/* Flags */}
           <div className="bg-[#0f0f1b] border border-white/10 rounded-2xl p-6 space-y-4">
             <h3 className="text-sm font-semibold text-white/40 uppercase tracking-widest mb-4">الخصائص</h3>
-            <FormToggle label="متوفر في المخزن" checked={form.in_stock} onChange={(v) => set('in_stock', v)} />
+            <FormToggle label="ظاهر في المتجر" checked={form.is_active} onChange={(v) => set('is_active', v)} />
             <FormToggle label="منتج مميز" checked={form.is_featured} onChange={(v) => set('is_featured', v)} />
             <FormToggle label="منتج جديد" checked={form.is_new} onChange={(v) => set('is_new', v)} />
             <FormToggle label="تخفيض" checked={form.is_on_sale} onChange={(v) => set('is_on_sale', v)} />

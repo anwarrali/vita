@@ -13,6 +13,12 @@ import {
   getItemUnitPrice,
   formatVariantLabels,
 } from '../lib/productUtils';
+import {
+  getAvailableStock,
+  getProductStockStatus,
+  isProductPurchasable,
+  STOCK_STATUS_LABELS,
+} from '../lib/inventory';
 import type { ProductVariant, SelectedVariant } from '../types';
 import { toast } from 'sonner';
 import { ShoppingCart, ChevronLeft, Minus, Plus, Loader2, Banknote, Truck, Package } from 'lucide-react';
@@ -33,7 +39,10 @@ function VariantSelector({
       <div className="flex flex-wrap gap-2">
         {variant.options.map((option) => {
           const isSelected = selectedOptionId === option.id;
-          const outOfStock = option.inStock === false;
+          const optionStock =
+            typeof option.stockQuantity === 'number' ? option.stockQuantity : null;
+          const outOfStock =
+            optionStock !== null ? optionStock <= 0 : option.inStock === false;
           return (
             <button
               key={option.id}
@@ -55,6 +64,9 @@ function VariantSelector({
                 />
               )}
               {option.labelAr}
+              {optionStock != null && optionStock > 0 && optionStock <= 3 ? (
+                <span className="text-xs mr-1 text-amber-600">({optionStock})</span>
+              ) : null}
               {option.priceModifier ? (
                 <span className="text-xs mr-1">
                   ({option.priceModifier > 0 ? '+' : ''}₪{option.priceModifier})
@@ -108,6 +120,15 @@ export function ProductDetails() {
   }, [product, selectedOptions]);
 
   const unitPrice = product ? getItemUnitPrice(product, selectedVariants) : 0;
+  const availableStock = product ? getAvailableStock(product, selectedVariants) : 0;
+  const stockStatus = product ? getProductStockStatus(product, selectedVariants) : 'out_of_stock';
+  const canPurchase = product ? isProductPurchasable(product, selectedVariants) : false;
+
+  useEffect(() => {
+    if (quantity > availableStock && availableStock > 0) {
+      setQuantity(availableStock);
+    }
+  }, [availableStock, quantity]);
 
   const galleryImages = useMemo(() => {
     if (!product) return [];
@@ -186,7 +207,10 @@ export function ProductDetails() {
             <div className="flex items-start gap-2 mb-4">
               {product.isNew && <Badge className="bg-success text-white">جديد</Badge>}
               {product.isOnSale && <Badge variant="destructive">تخفيض</Badge>}
-              {!product.inStock && <Badge variant="secondary">غير متوفر</Badge>}
+              {stockStatus === 'out_of_stock' && <Badge variant="secondary">نفد المخزون</Badge>}
+              {stockStatus === 'low_stock' && (
+                <Badge className="bg-amber-500 text-white">مخزون منخفض</Badge>
+              )}
             </div>
 
             <h1 className="text-3xl md:text-4xl font-bold mb-3">{product.nameAr}</h1>
@@ -235,7 +259,7 @@ export function ProductDetails() {
                   variant="outline"
                   size="icon"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={!product.inStock}
+                  disabled={!canPurchase || quantity <= 1}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -243,12 +267,17 @@ export function ProductDetails() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setQuantity(quantity + 1)}
-                  disabled={!product.inStock}
+                  onClick={() => setQuantity(Math.min(availableStock, quantity + 1))}
+                  disabled={!canPurchase || quantity >= availableStock}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
+              {canPurchase && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  المتوفر: {availableStock} قطعة
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -256,7 +285,7 @@ export function ProductDetails() {
                 size="lg"
                 className="flex-1"
                 onClick={handleAddToCart}
-                disabled={!product.inStock || !variantsComplete}
+                disabled={!canPurchase || !variantsComplete}
               >
                 <ShoppingCart className="ml-2 h-5 w-5" />
                 أضف إلى السلة
@@ -266,7 +295,7 @@ export function ProductDetails() {
                 variant="outline"
                 className="flex-1"
                 onClick={handleBuyNow}
-                disabled={!product.inStock || !variantsComplete}
+                disabled={!canPurchase || !variantsComplete}
               >
                 اشتري الآن
               </Button>
@@ -278,7 +307,7 @@ export function ProductDetails() {
                   <Package className="h-4 w-4 text-primary flex-shrink-0" />
                   <div className="flex items-center justify-between flex-1">
                     <span className="text-muted-foreground">الحالة</span>
-                    <span className="font-medium">{product.inStock ? 'متوفر' : 'غير متوفر'}</span>
+                    <span className="font-medium">{STOCK_STATUS_LABELS[stockStatus]}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

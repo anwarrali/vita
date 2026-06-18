@@ -12,7 +12,11 @@ export interface Product {
   category: string;
   subcategory: string;
   brand?: string;
+  stockQuantity: number;
   inStock: boolean;
+  /** True when stock is stored in DB (stock_quantity column or variant stockQuantity). */
+  hasExplicitInventory?: boolean;
+  isActive: boolean;
   isFeatured: boolean;
   isNew: boolean;
   isOnSale: boolean;
@@ -26,6 +30,7 @@ export interface ProductVariantOption {
   label: string;
   labelAr: string;
   priceModifier?: number;
+  stockQuantity?: number;
   inStock?: boolean;
   colorHex?: string;
   imageUrl?: string;

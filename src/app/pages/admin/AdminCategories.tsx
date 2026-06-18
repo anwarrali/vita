@@ -77,6 +77,33 @@ export function AdminCategories() {
 
   const rootCats = (categories as Record<string, unknown>[]).filter((c) => !c.parent_id);
 
+  const ACTION_BTN =
+    'inline-flex items-center justify-center min-w-11 min-h-11 p-2.5 rounded-xl transition-colors';
+
+  function renderActions(cat: Record<string, unknown>) {
+    return (
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          type="button"
+          onClick={() => startEdit(cat)}
+          className={`${ACTION_BTN} bg-[#292b99]/20 text-[#8c8eff] hover:bg-[#292b99]/40`}
+          title="تعديل"
+        >
+          <Pencil className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => handleDelete(cat.id as string)}
+          disabled={deleting === cat.id}
+          className={`${ACTION_BTN} bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-40`}
+          title="حذف"
+        >
+          {deleting === cat.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
@@ -155,36 +182,53 @@ export function AdminCategories() {
             <p>لا توجد أقسام بعد</p>
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
-            {(categories as Record<string, unknown>[]).map((cat) => (
-              <div key={cat.id as string} className="flex items-center gap-4 px-5 py-4 hover:bg-white/5 group transition-colors">
-                {cat.image_url ? (
-                  <img src={cat.image_url as string} alt="" className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0" />
-                ) : (
-                  <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-                    <Tag className="h-4 w-4 text-white/20" />
+          <>
+            <div className="md:hidden divide-y divide-white/5 p-3 space-y-3">
+              {(categories as Record<string, unknown>[]).map((cat) => (
+                <div key={cat.id as string} className="rounded-xl border border-white/10 p-4 space-y-3 bg-white/[0.02]">
+                  <div className="flex items-center gap-4">
+                    {cat.image_url ? (
+                      <img src={cat.image_url as string} alt="" className="w-12 h-12 rounded-lg object-cover border border-white/10 shrink-0" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                        <Tag className="h-4 w-4 text-white/20" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-medium">{cat.name_ar as string}</p>
+                      <p className="text-white/30 text-xs">
+                        {cat.slug as string}
+                        {cat.parent_id && <span className="text-[#8c8eff] mr-2">↳ قسم فرعي</span>}
+                      </p>
+                    </div>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium">{cat.name_ar as string}</p>
-                  <p className="text-white/30 text-xs">
-                    {cat.slug as string}
-                    {cat.parent_id && <span className="text-[#8c8eff] mr-2">↳ قسم فرعي</span>}
-                  </p>
+                  {renderActions(cat)}
                 </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => startEdit(cat)}
-                    className="p-2 rounded-lg bg-[#292b99]/20 hover:bg-[#292b99]/40 text-[#8c8eff] transition-colors">
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button onClick={() => handleDelete(cat.id as string)} disabled={deleting === cat.id}
-                    className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors disabled:opacity-40">
-                    {deleting === cat.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                  </button>
+              ))}
+            </div>
+
+            <div className="hidden md:block divide-y divide-white/5">
+              {(categories as Record<string, unknown>[]).map((cat) => (
+                <div key={cat.id as string} className="flex items-center gap-4 px-5 py-4 hover:bg-white/5 transition-colors">
+                  {cat.image_url ? (
+                    <img src={cat.image_url as string} alt="" className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                      <Tag className="h-4 w-4 text-white/20" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-medium">{cat.name_ar as string}</p>
+                    <p className="text-white/30 text-xs">
+                      {cat.slug as string}
+                      {cat.parent_id && <span className="text-[#8c8eff] mr-2">↳ قسم فرعي</span>}
+                    </p>
+                  </div>
+                  {renderActions(cat)}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
