@@ -27,6 +27,9 @@ export function OrderSuccess() {
             <p className="text-lg text-muted-foreground mb-8">
               شكراً لثقتك بـ <span className="font-semibold text-primary">Vita</span>.
               سنتواصل معك على رقم الهاتف المُدخل لتأكيد الطلب وترتيب التوصيل.
+              {orderData?.customerEmail && (
+                <> تم إرسال تأكيد الطلب إلى بريدك الإلكتروني.</>
+              )}
             </p>
 
             {orderData && (
@@ -47,6 +50,13 @@ export function OrderSuccess() {
                     <span className="text-muted-foreground">الاسم:</span>
                     <span className="font-medium">{orderData.customerName}</span>
                   </div>
+
+                  {orderData.customerEmail && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">البريد الإلكتروني:</span>
+                      <span className="font-medium" dir="ltr">{orderData.customerEmail}</span>
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">رقم الهاتف:</span>

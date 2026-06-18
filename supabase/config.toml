@@ -1,0 +1,7 @@
+# Supabase local development config
+
+[api]
+enabled = true
+
+[functions.send-order-email]
+verify_jwt = true

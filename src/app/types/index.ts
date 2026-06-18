@@ -85,6 +85,7 @@ export interface ShippingOption {
 export interface OrderDetails {
   orderId?: string;
   customerName: string;
+  customerEmail?: string;
   phone: string;
   address: string;
   region: ShippingRegion;

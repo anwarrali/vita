@@ -19,6 +19,7 @@ export function Checkout() {
   const { cart, cartTotal, clearCart } = useCart();
   const [formData, setFormData] = useState({
     customerName: '',
+    customerEmail: '',
     phone: '',
     address: '',
     region: '' as ShippingRegion | '',
@@ -43,8 +44,14 @@ export function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.customerName.trim() || !formData.phone.trim() || !formData.address.trim() || !formData.region) {
+    if (!formData.customerName.trim() || !formData.customerEmail.trim() || !formData.phone.trim() || !formData.address.trim() || !formData.region) {
       toast.error('الرجاء ملء جميع الحقول المطلوبة');
+      return;
+    }
+
+    const email = formData.customerEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error('الرجاء إدخال بريد إلكتروني صحيح');
       return;
     }
 
@@ -58,6 +65,7 @@ export function Checkout() {
     try {
       const result = await submitOrder({
         customerName: formData.customerName,
+        customerEmail: email,
         phone: formData.phone,
         address: formData.address,
         region: formData.region,
@@ -72,6 +80,7 @@ export function Checkout() {
       const orderData = {
         orderId: result.orderId,
         customerName: formData.customerName,
+        customerEmail: email,
         phone: formData.phone,
         address: formData.address,
         region: formData.region,
@@ -86,6 +95,7 @@ export function Checkout() {
       };
 
       clearCart();
+      toast.success('تم استلام طلبك بنجاح');
       navigate('/order-success', { state: { orderData } });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'حدث خطأ أثناء إرسال الطلب';
@@ -117,6 +127,19 @@ export function Checkout() {
                       value={formData.customerName}
                       onChange={(e) => updateField('customerName', e.target.value)}
                       placeholder="أدخل اسمك الكامل"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email">البريد الإلكتروني *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      dir="ltr"
+                      value={formData.customerEmail}
+                      onChange={(e) => updateField('customerEmail', e.target.value)}
+                      placeholder="example@email.com"
                     />
                   </div>
 
