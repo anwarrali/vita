@@ -14,6 +14,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminProductForm } from './pages/admin/AdminProductForm';
 import { AdminCategories } from './pages/admin/AdminCategories';
+import { AdminOrders } from './pages/admin/AdminOrders';
 
 export const router = createBrowserRouter([
   // ── Public Store ──────────────────────────────────────────────────
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { path: 'dashboard', element: <AdminDashboard /> },
+      { path: 'orders', element: <AdminOrders /> },
       { path: 'products', element: <AdminProducts /> },
       { path: 'products/new', element: <AdminProductForm /> },
       { path: 'products/:id/edit', element: <AdminProductForm /> },

@@ -12,6 +12,37 @@ import { Slider } from '../components/ui/slider';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../components/ui/sheet';
 import { Filter, X, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
+import type { Product } from '../types';
+
+function interleaveCategories(productsList: Product[]): Product[] {
+  const groups: { [category: string]: Product[] } = {};
+  for (const product of productsList) {
+    const cat = product.category || 'other';
+    if (!groups[cat]) {
+      groups[cat] = [];
+    }
+    groups[cat].push(product);
+  }
+
+  const categories = Object.keys(groups);
+  const result: Product[] = [];
+  let hasMore = true;
+  let index = 0;
+
+  while (hasMore) {
+    hasMore = false;
+    for (const cat of categories) {
+      const group = groups[cat];
+      if (index < group.length) {
+        result.push(group[index]);
+        hasMore = true;
+      }
+    }
+    index++;
+  }
+
+  return result;
+}
 
 export function ProductListing() {
   const { data: categories } = useCategories();
@@ -73,21 +104,38 @@ export function ProductListing() {
     // Price range
     filtered = filtered.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
 
-    // Sort
-    switch (sortBy) {
-      case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
-        filtered.sort((a, b) => a.nameAr.localeCompare(b.nameAr, 'ar'));
-        break;
-      case 'newest':
-      default:
-        filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-        break;
+    // Sort & Interleave
+    const isDefaultView =
+      !categoryFromUrl &&
+      !subcategoryFromUrl &&
+      !filterFromUrl &&
+      selectedCategories.length === 0 &&
+      selectedSubcategories.length === 0 &&
+      !showOnlyInStock &&
+      !showOnlySale &&
+      !showOnlyNew &&
+      sortBy === 'newest' &&
+      priceRange[0] === 0 &&
+      priceRange[1] === 500;
+
+    if (isDefaultView) {
+      filtered = interleaveCategories(filtered);
+    } else {
+      switch (sortBy) {
+        case 'price-asc':
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-desc':
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case 'name':
+          filtered.sort((a, b) => a.nameAr.localeCompare(b.nameAr, 'ar'));
+          break;
+        case 'newest':
+        default:
+          filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+          break;
+      }
     }
 
     return filtered;
@@ -265,7 +313,7 @@ export function ProductListing() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

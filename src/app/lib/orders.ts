@@ -7,6 +7,8 @@ import { shippingOptions } from '../data/shipping';
 import type { CartItem, ShippingRegion } from '../types';
 
 export interface OrderEmailItem {
+  id: string;
+  image: string;
   name: string;
   quantity: number;
   unitPrice: number;
@@ -71,6 +73,8 @@ function buildEmailPayload(
         : item.product.nameAr;
 
       return {
+        id: item.product.id,
+        image: item.product.image || '',
         name,
         quantity: item.quantity,
         unitPrice,

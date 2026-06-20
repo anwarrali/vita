@@ -25,10 +25,20 @@ export function buildOrderEmailHtml(order: OrderEmailPayload): string {
 
   const itemsHtml = order.items.map((item) => `
     <tr>
-      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;">${escapeHtml(item.name)}</td>
-      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;text-align:center;">${item.quantity}</td>
-      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;text-align:left;direction:ltr;">${formatMoney(item.unitPrice)}</td>
-      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;text-align:left;direction:ltr;font-weight:700;">${formatMoney(item.totalPrice)}</td>
+      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;">
+        <table role="presentation" cellspacing="0" cellpadding="0">
+          <tr>
+            ${item.image ? `<td style="padding-right:12px;width:48px;"><img src="${item.image}" alt="${escapeHtml(item.name)}" width="48" height="48" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid #e8e8f0;display:block;" /></td>` : ''}
+            <td>
+              <div style="font-weight:600;color:#1a1a2e;margin-bottom:4px;line-height:1.4;">${escapeHtml(item.name)}</div>
+              ${item.id ? `<div style="font-size:12px;color:#8f8f9d;font-family:monospace;line-height:1.2;">ID: ${escapeHtml(item.id)}</div>` : ''}
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;text-align:center;vertical-align:top;padding-top:16px;">${item.quantity}</td>
+      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;text-align:left;direction:ltr;vertical-align:top;padding-top:16px;">${formatMoney(item.unitPrice)}</td>
+      <td style="padding:12px 0;border-bottom:1px solid #f0f0f5;font-size:14px;text-align:left;direction:ltr;font-weight:700;vertical-align:top;padding-top:16px;">${formatMoney(item.totalPrice)}</td>
     </tr>
   `).join('');
 

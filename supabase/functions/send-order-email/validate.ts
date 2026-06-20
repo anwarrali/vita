@@ -97,6 +97,8 @@ export function parseOrderEmailPayload(body: unknown): ParseResult {
 
       if (name && quantity && unitPrice !== null && totalPrice !== null) {
         items.push({
+          id: typeof item.id === 'string' && item.id.trim() !== '' ? item.id.trim() : undefined,
+          image: typeof item.image === 'string' && item.image.trim() !== '' ? item.image.trim() : undefined,
           name,
           quantity,
           unitPrice: Math.round(unitPrice * 100) / 100,

@@ -9,10 +9,12 @@ import {
   LogOut,
   Menu,
   ChevronRight,
+  ShoppingBag,
 } from 'lucide-react';
 
 const NAV = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'لوحة التحكم' },
+  { to: '/admin/orders', icon: ShoppingBag, label: 'الطلبات' },
   { to: '/admin/products', icon: Package, label: 'المنتجات' },
   { to: '/admin/categories', icon: Tag, label: 'الأقسام' },
 ];
